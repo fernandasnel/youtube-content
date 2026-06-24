@@ -145,24 +145,9 @@ def main():
     published_posts = sitemap.load(lang)
     print(f"✅  {len(published_posts)} posts carregados do sitemap")
 
-    # ── Keywords primeiro ──────────────────────────────────────────────────────
-    use_ahrefs = utils.ask_yes_no("\n🔑  Buscar palavras-chave via Ahrefs API?")
-
-    if use_ahrefs:
-        topic_hint = input("  Tema central do conteúdo (para busca no Ahrefs): ").strip()
-        kw_data = keywords.from_ahrefs(topic_hint, lang)
-    else:
-        print("\nDigite as palavras-chave (Enter para pular):")
-        main_kw = input("  Palavra-chave principal: ").strip()
-        sec_kws = input("  Palavras-chave secundárias (separadas por vírgula): ").strip()
-        intent  = input("  Intenção de busca (informacional/comercial/transacional): ").strip()
-        kw_data = keywords.from_manual(main_kw, sec_kws, intent)
-
-    print(f"\n✅  Palavras-chave: {kw_data['main']} + {len(kw_data['secondary'])} secundárias")
-
-    # ── Ângulos informados pelas keywords ──────────────────────────────────────
+    # ── Ângulos primeiro ───────────────────────────────────────────────────────
     print("\n🧠  Analisando conteúdo e sugerindo ângulos...")
-    angles = writer.suggest_angles(transcript_text, published_posts, lang, kw_data)
+    angles = writer.suggest_angles(transcript_text, published_posts, lang, {})
 
     print("\n" + "─"*60)
     print("📐  ÂNGULOS SUGERIDOS:\n")
@@ -179,6 +164,21 @@ def main():
         angle_description = angle_input
 
     print(f"\n✅  Ângulo definido: {angle_description}")
+
+    # ── Keywords (após ângulo definido) ────────────────────────────────────────
+    use_ahrefs = utils.ask_yes_no("\n🔑  Buscar palavras-chave via Ahrefs API?")
+
+    if use_ahrefs:
+        topic_hint = input("  Tema/seed keywords para busca no Ahrefs: ").strip()
+        kw_data = keywords.from_ahrefs(topic_hint, lang)
+    else:
+        print("\nDigite as palavras-chave (Enter para pular):")
+        main_kw = input("  Palavra-chave principal: ").strip()
+        sec_kws = input("  Palavras-chave secundárias (separadas por vírgula): ").strip()
+        intent  = input("  Intenção de busca (informacional/comercial/transacional): ").strip()
+        kw_data = keywords.from_manual(main_kw, sec_kws, intent)
+
+    print(f"\n✅  Palavras-chave: {kw_data['main']} + {len(kw_data['secondary'])} secundárias")
 
     # ── Outline ────────────────────────────────────────────────────────────────
     print("\n📋  Gerando estrutura do post...")
